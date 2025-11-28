@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h4 mb-4">Update Profile</h2>
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input class="form-control" name="full_name" value="{{ patient.user.full_name }}" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input class="form-control" name="phone" value="{{ patient.user.phone }}" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address</label>
+              <textarea class="form-control" rows="2" name="address">{{ patient.address }}</textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Blood Group</label>
+              <input class="form-control" name="blood_group" value="{{ patient.blood_group }}" />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Emergency Contact</label>
+              <input class="form-control" name="emergency_contact" value="{{ patient.emergency_contact }}" />
+            </div>
+          </div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

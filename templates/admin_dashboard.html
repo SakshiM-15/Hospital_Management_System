@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h3 mb-0">Admin Dashboard</h1>
+    <p class="text-muted mb-0">Monitor hospital activity and maintain records.</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{{ url_for('search_doctors') }}">Doctor Directory</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stats-card border-0 shadow-sm">
+      <div class="card-body">
+        <p class="text-muted mb-1">Doctors</p>
+        <h3 class="fw-bold">{{ total_doctors }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stats-card border-0 shadow-sm">
+      <div class="card-body">
+        <p class="text-muted mb-1">Patients</p>
+        <h3 class="fw-bold">{{ total_patients }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stats-card border-0 shadow-sm">
+      <div class="card-body">
+        <p class="text-muted mb-1">Appointments</p>
+        <h3 class="fw-bold">{{ total_appointments }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-0">Doctors</h5>
+          <form class="d-flex gap-2" method="get">
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              name="doctor_query"
+              value="{{ doctor_query }}"
+              placeholder="Search by name"
+            />
+            <button class="btn btn-sm btn-outline-secondary">Search</button>
+          </form>
+        </div>
+
+        <form class="row g-2 mb-3" method="post" action="{{ url_for('create_doctor') }}">
+          <div class="col-md-6">
+            <input class="form-control" name="full_name" placeholder="Full name" required />
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" name="email" placeholder="Email" required />
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" name="phone" placeholder="Phone" />
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" name="specialization" placeholder="Specialization" required />
+          </div>
+          <div class="col-md-6">
+            <select class="form-select" name="department_id" required>
+              <option value="">Department</option>
+              {% for department in departments %}
+              <option value="{{ department.id }}">{{ department.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" name="room" placeholder="Room / Location" />
+          </div>
+          <div class="col-12">
+            <input
+              class="form-control"
+              name="availability_summary"
+              placeholder="Availability summary (e.g. Mon-Fri 10am-3pm)"
+            />
+          </div>
+          <div class="col-12">
+            <input class="form-control" name="password" placeholder="Temporary password" />
+          </div>
+          <div class="col-12 text-end">
+            <button class="btn btn-primary btn-sm">Add Doctor</button>
+          </div>
+        </form>
+
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for doctor in doctors %}
+              <tr>
+                <td>
+                  <strong>{{ doctor.user.full_name }}</strong>
+                  <br />
+                  <small class="text-muted">{{ doctor.specialization }}</small>
+                </td>
+                <td>{{ doctor.department.name }}</td>
+                <td>
+                  <span class="badge {{ 'bg-success' if doctor.is_active else 'bg-secondary' }}">
+                    {{ "Active" if doctor.is_active else "Inactive" }}
+                  </span>
+                </td>
+                <td class="text-end d-flex flex-column gap-1">
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#doctor-{{ doctor.id }}"
+                  >
+                    Edit
+                  </button>
+                  <form method="post" action="{{ url_for('toggle_doctor', doctor_id=doctor.id) }}">
+                    <button class="btn btn-outline-danger btn-sm w-100">
+                      {{ "Deactivate" if doctor.is_active else "Activate" }}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr class="collapse" id="doctor-{{ doctor.id }}">
+                <td colspan="4">
+                  <form class="row g-2" method="post" action="{{ url_for('update_doctor', doctor_id=doctor.id) }}">
+                    <div class="col-md-6">
+                      <input class="form-control" name="full_name" value="{{ doctor.user.full_name }}" />
+                    </div>
+                    <div class="col-md-6">
+                      <input class="form-control" name="phone" value="{{ doctor.user.phone }}" />
+                    </div>
+                    <div class="col-md-6">
+                      <input class="form-control" name="specialization" value="{{ doctor.specialization }}" />
+                    </div>
+                    <div class="col-md-6">
+                      <select class="form-select" name="department_id">
+                        {% for department in departments %}
+                        <option value="{{ department.id }}" {% if doctor.department_id == department.id %}selected{% endif %}>
+                          {{ department.name }}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <input class="form-control" name="room" value="{{ doctor.room }}" placeholder="Room" />
+                    </div>
+                    <div class="col-md-6">
+                      <input
+                        class="form-control"
+                        name="availability_summary"
+                        value="{{ doctor.availability_summary }}"
+                        placeholder="Availability"
+                      />
+                    </div>
+                    <div class="col-12 text-end">
+                      <button class="btn btn-primary btn-sm">Save Changes</button>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-0">Patients</h5>
+          <form class="d-flex gap-2" method="get">
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              name="patient_query"
+              value="{{ patient_query }}"
+              placeholder="Search by name"
+            />
+            <button class="btn btn-sm btn-outline-secondary">Search</button>
+          </form>
+        </div>
+        <div class="table-responsive mb-3">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for patient in patients %}
+              <tr>
+                <td>{{ patient.user.full_name }}</td>
+                <td>{{ patient.user.phone or "—" }}</td>
+                <td>
+                  <span class="badge {{ 'bg-success' if patient.user.is_active else 'bg-secondary' }}">
+                    {{ "Active" if patient.user.is_active else "Inactive" }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#patient-{{ patient.id }}"
+                  >
+                    Edit
+                  </button>
+                  <form
+                    class="d-inline"
+                    method="post"
+                    action="{{ url_for('toggle_patient', patient_id=patient.id) }}"
+                  >
+                    <button class="btn btn-outline-danger btn-sm">
+                      {{ "Deactivate" if patient.user.is_active else "Activate" }}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr class="collapse" id="patient-{{ patient.id }}">
+                <td colspan="4">
+                  <form method="post" action="{{ url_for('admin_update_patient', patient_id=patient.id) }}">
+                    <div class="row g-2">
+                      <div class="col-md-6">
+                        <input class="form-control" name="full_name" value="{{ patient.user.full_name }}" />
+                      </div>
+                      <div class="col-md-6">
+                        <input class="form-control" name="phone" value="{{ patient.user.phone }}" />
+                      </div>
+                      <div class="col-12">
+                        <input class="form-control" name="address" value="{{ patient.address }}" placeholder="Address" />
+                      </div>
+                      <div class="col-6">
+                        <input
+                          class="form-control"
+                          name="blood_group"
+                          value="{{ patient.blood_group }}"
+                          placeholder="Blood group"
+                        />
+                      </div>
+                      <div class="col-12 text-end">
+                        <button class="btn btn-primary btn-sm">Save</button>
+                      </div>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">All Appointments</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for appointment in appointments %}
+              <tr>
+                <td>
+                  {{ appointment.appointment_date.strftime('%b %d') }}
+                  <br />
+                  <small class="text-muted">{{ appointment.appointment_time.strftime('%H:%M') }}</small>
+                </td>
+                <td>{{ appointment.patient.user.full_name }}</td>
+                <td>{{ appointment.doctor.user.full_name }}</td>
+                <td>
+                  <span class="badge bg-secondary">{{ appointment.status.value }}</span>
+                </td>
+                <td class="text-end">
+                  <form
+                    class="d-inline-flex gap-2"
+                    method="post"
+                    action="{{ url_for('admin_update_appointment', appointment_id=appointment.id) }}"
+                  >
+                    <select class="form-select form-select-sm" name="status">
+                      {% for status in AppointmentStatus %}
+                      <option value="{{ status.name }}" {% if appointment.status == status %}selected{% endif %}>
+                        {{ status.value }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn-outline-primary btn-sm">Update</button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-center text-muted">No appointments yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

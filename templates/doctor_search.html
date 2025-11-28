@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-4">
+  <div class="col-lg-8 mx-auto">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h4 mb-3 text-center">Find a Doctor</h2>
+        <form class="row g-3" method="get">
+          <div class="col-md-6">
+            <label class="form-label">Specialization</label>
+            <input class="form-control" name="specialization" value="{{ request.args.get('specialization','') }}" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Doctor Name</label>
+            <input class="form-control" name="name" value="{{ request.args.get('name','') }}" />
+          </div>
+          <div class="col-12 text-end">
+            <button class="btn btn-primary">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  {% for doctor in doctors %}
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title">{{ doctor.user.full_name }}</h5>
+        <p class="text-muted mb-1">{{ doctor.specialization }}</p>
+        <p class="small">{{ doctor.department.name }}</p>
+        <p class="small text-secondary mb-0">
+          {{ doctor.availability_summary or "Availability shared privately" }}
+        </p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted">
+    No doctors found for the selected filters.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+

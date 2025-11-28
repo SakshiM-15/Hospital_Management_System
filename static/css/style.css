@@ -1,0 +1,27 @@
+:root {
+  --primary: #2272ff;
+  --bg-light: #f7fbff;
+}
+
+body {
+  background: var(--bg-light);
+}
+
+.stats-card {
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.hero-card {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.alert-stack .alert {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+table td,
+table th {
+  vertical-align: middle;
+}
+

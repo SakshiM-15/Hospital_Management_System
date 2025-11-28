@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row align-items-center mb-5">
+  <div class="col-lg-6">
+    <p class="text-uppercase text-primary fw-semibold mb-2">Hospital Management System</p>
+    <h1 class="display-5 fw-bold">
+      Streamline appointments, treatment notes, and patient history in one place.
+    </h1>
+    <p class="lead text-muted">
+      Admins, doctors, and patients collaborate through a central portal that keeps schedules
+      conflict-free, records up to date, and treatment plans transparent.
+    </p>
+    <div class="d-flex gap-3 flex-wrap">
+      {% if not current_user.is_authenticated %}
+      <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}">Get Started</a>
+      <a class="btn btn-outline-primary btn-lg" href="{{ url_for('login') }}">Login</a>
+      {% else %}
+      <a class="btn btn-primary btn-lg" href="{{ url_for('redirect_dashboard') }}">Go to Dashboard</a>
+      {% endif %}
+      <a class="btn btn-link" href="{{ url_for('search_doctors') }}">Browse Doctors</a>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="hero-card shadow-sm p-4 bg-white rounded-4">
+      <h5 class="text-muted mb-3">Live Snapshot</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Departments</span>
+          <strong>{{ departments|length }}</strong>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Featured Doctors</span>
+          <strong>{{ doctors|length }}</strong>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>24/7 Secure Access</span>
+          <span class="badge bg-success">Online</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Departments</h2>
+    <a href="#departments" class="btn btn-sm btn-outline-secondary">View All</a>
+  </div>
+  <div class="row g-4" id="departments">
+    {% for department in departments %}
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ department.name }}</h5>
+          <p class="card-text text-muted">{{ department.description }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Featured Doctors</h2>
+    <a href="{{ url_for('search_doctors') }}" class="btn btn-sm btn-outline-primary">Search Directory</a>
+  </div>
+  <div class="row g-4">
+    {% for doctor in doctors %}
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ doctor.user.full_name }}</h5>
+          <p class="text-muted mb-1">{{ doctor.specialization }}</p>
+          <p class="small">{{ doctor.department.name }}</p>
+          <p class="small text-secondary mb-0">
+            {{ doctor.availability_summary or "Availability shared on dashboard" }}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% if not doctors %}
+    <p class="text-muted">No doctors registered yet. Admins can add them from the dashboard.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+

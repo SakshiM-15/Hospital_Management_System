@@ -1,0 +1,13 @@
+name: User Verification Action
+on: [push, workflow_dispatch]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 22f2000537@ds.study.iitm.ac.in
+        run: |
+          echo "Verification Step for: 22f2000537@ds.study.iitm.ac.in"
+          echo "Timestamp: $(date)"
